@@ -57,18 +57,28 @@ fun main() {
     println("ผลรวมราคาสินค้า Electronics ที่ราคา > 500 บาท: $totalElecPriceOver500Sequence บาท")
     println("--------------------------------------------------")
 
+    val morethan10000 = products.asSequence()
+        .filter { it.price > 10000 }
 
-    println("อภิปรายความแตกต่างระหว่าง List และ Sequence:")
-    println("1. List Operations (วิธีที่ 1):")
-    println("   - ทุกครั้งที่เรียกใช้ operation (เช่น filter, map) จะมีการสร้าง Collection (List) ใหม่ขึ้นมาเพื่อเก็บผลลัพธ์ของขั้นนั้นๆ")
-    println("   - ตัวอย่าง: filter ครั้งแรกสร้าง List ใหม่ -> filter ครั้งที่สองสร้าง List ใหม่อีกใบ -> map สร้าง List สุดท้าย -> sum ทำงาน")
-    println("   - เหมาะกับข้อมูลขนาดเล็ก เพราะเข้าใจง่าย แต่ถ้าข้อมูลมีขนาดใหญ่มาก (ล้าน records) จะสิ้นเปลืองหน่วยความจำและเวลาในการสร้าง Collection ใหม่ๆ ซ้ำซ้อน")
-    println()
-    println("2. Sequence Operations (วิธีที่ 2):")
-    println("   - ใช้การประมวลผลแบบ 'Lazy' (ทำเมื่อต้องการใช้ผลลัพธ์จริงๆ)")
-    println("   - operations ทั้งหมด (filter, map) จะไม่ทำงานทันที แต่จะถูกเรียงต่อกันไว้")
-    println("   - ข้อมูลแต่ละชิ้น (each element) จะไหลผ่าน Pipeline ทั้งหมดทีละชิ้น จนจบกระบวนการ")
-    println("   - เช่น: 'Laptop' จะถูก filter category -> filter price -> map price จากนั้น 'Smartphone' ถึงจะเริ่มทำกระบวนการเดียวกัน")
-    println("   - จะไม่มีการสร้าง Collection กลางทาง ทำให้ประหยัดหน่วยความจำและเร็วกว่ามากสำหรับชุดข้อมูลขนาดใหญ่ เพราะทำงานกับข้อมูลทีละชิ้นและทำทุกขั้นตอนให้เสร็จในรอบเดียว")
-    println("   - การคำนวณจะเกิดขึ้นเมื่อมี 'Terminal Operation' มาเรียกใช้เท่านั้น (ในที่นี้คือ .sum())")
+    val lowthan1000 = products.asSequence()
+        .filter { it.price < 1000 }
+
+    val between1000To9999 = products.asSequence()
+        .filter { it.price < 10000 }
+        .filter { it.price > 999 }
+
+    println("กลุ่มสินค้าตามราคา:")
+
+    println("10,000 บาทขึ้นไป: ")
+    morethan10000.forEach { println( "- "+it.name+" ("+it.price+" บาท)" ) }
+
+    println("ไม่เกิน 1,000 บาท: ")
+    lowthan1000.forEach { println( "- "+it.name+" ("+it.price+" บาท)" ) }
+
+    println("1,000 - 9,999 บาท: ")
+    between1000To9999.forEach { println( "S- "+it.name+" ("+it.price+" บาท)" ) }
+
+    println("--------------------------------------------------")
+
+
 }
