@@ -1,4 +1,6 @@
 import kotlin.test.Test
+import org.example.celsiusToFahrenheit
+import org.example.kilometersToMiles
 import kotlin.test.assertEquals
 
 class WorkshopTest {
@@ -24,7 +26,10 @@ class WorkshopTest {
     // expected output: 32.0
     @Test
     fun `test celsiusToFahrenheit with zero`() {
-
+        val input = 0.0
+        val expected = 32.0
+        val actual = celsiusToFahrenheit(input)
+        assertEquals(expected, actual, 0.001, "0°C should be 32°F")
     }
 
     // celsius input: -10.0
