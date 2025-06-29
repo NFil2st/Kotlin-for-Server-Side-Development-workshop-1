@@ -81,7 +81,7 @@ class WorkshopTest {
         val expected = 69300.0
         val actual = forTestTotalElecPriceOver500(products)
 
-        assertEquals(expected, actual, 0.001)
+        assertEquals(expected, actual, 0.001,"จะได้ 69300 บาท")
     }
 
 
@@ -102,7 +102,7 @@ class WorkshopTest {
         val expected = 4.0
         val actual = forTestCountElecPriceOver500(products)
 
-        assertEquals(expected, actual, 0.001)
+        assertEquals(expected, actual, 0.001,"ควรมีแค่4")
     }
 
     // --- Tests for Workshop #2: Data Analysis Pipeline End ---
