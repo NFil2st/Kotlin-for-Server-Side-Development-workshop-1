@@ -1,4 +1,4 @@
-package org.example
+package org.example1
 
 // 1. กำหนด data class สำหรับเก็บข้อมูลสินค้า
 data class Product(val name: String, val price: Double, val category: String)
@@ -39,7 +39,6 @@ fun main() {
         .map { it.price }
         .sum()
 
-
     println("วิธีที่ 1: ใช้ Chaining กับ List")
     println("ผลรวมราคาสินค้า Electronics ที่ราคา > 500 บาท: $totalElecPriceOver500 บาท")
     println("--------------------------------------------------")
@@ -76,9 +75,21 @@ fun main() {
     lowthan1000.forEach { println( "- "+it.name+" ("+it.price+" บาท)" ) }
 
     println("1,000 - 9,999 บาท: ")
-    between1000To9999.forEach { println( "S- "+it.name+" ("+it.price+" บาท)" ) }
+    between1000To9999.forEach { println( "- "+it.name+" ("+it.price+" บาท)" ) }
 
     println("--------------------------------------------------")
 
+    data class Product(val name: String, val category: String, val price: Double)
 
+}
+fun forTestTotalElecPriceOver500(products: List<Product>): Double {
+    return products
+        .filter { it.price > 500 }
+        .filter { it.category == "Electronics" }
+        .sumOf { it.price }
+}
+
+fun forTestCountElecPriceOver500(products: List<Product>): Double {
+    val count = products.count { it.price > 500 && it.category == "Electronics" }
+    return count.toDouble()
 }

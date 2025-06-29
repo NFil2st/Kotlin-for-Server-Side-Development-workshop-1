@@ -1,7 +1,12 @@
 import kotlin.test.Test
+import kotlin.test.assertEquals
+
 import org.example.celsiusToFahrenheit
 import org.example.kilometersToMiles
-import kotlin.test.assertEquals
+
+import org.example1.forTestTotalElecPriceOver500
+import org.example1.forTestCountElecPriceOver500
+import org.example1.Product
 
 class WorkshopTest {
 
@@ -36,7 +41,10 @@ class WorkshopTest {
     // expected output: 14.0
     @Test
     fun `test celsiusToFahrenheit with negative value`() {
-
+        val input = -10.0
+        val expected = 14.0
+        val actual = celsiusToFahrenheit(input)
+        assertEquals(expected, actual, 0.001, "-10°C should be 14°F")
     }
 
     // test for kilometersToMiles function
@@ -44,7 +52,10 @@ class WorkshopTest {
     // expected output: 0.621371
     @Test
     fun `test kilometersToMiles with one kilometer`() {
-
+        val input = 1.0
+        val expected = 0.621371
+        val actual = kilometersToMiles(input)
+        assertEquals(expected, actual, 0.001, "1 km should be 0.621371 miles")
     }
 
     // --- Tests for Workshop #1: Unit Converter End ---
@@ -55,10 +66,44 @@ class WorkshopTest {
     // ในที่นี้จะสมมุติว่ามีฟังก์ชันชื่อ calculateTotalElectronicsPriceOver500 ที่รับ List<Product> และคืนค่า Double
     // จงเขียน test cases สำหรับฟังก์ชันนี้ โดยตรวจสอบผลรวมราคาสินค้า Electronics ที่ราคา > 500 บาท
     // 🚨
+    @Test
+    fun `test total Electronics over 500`() {
+        val products = listOf(
+            Product(name = "Laptop", price = 35000.0, category = "Electronics"),
+            Product(name = "Smartphone", price = 25000.0, category = "Electronics"),
+            Product(name = "T-shirt", price = 450.0, category = "Apparel"),
+            Product(name = "Monitor", price = 7500.0, category = "Electronics"),
+            Product(name = "Keyboard", price = 499.0, category = "Electronics"),
+            Product(name = "Jeans", price = 1200.0, category = "Apparel"),
+            Product(name = "Headphones", price = 1800.0, category = "Electronics")
+        )
+
+        val expected = 69300.0
+        val actual = forTestTotalElecPriceOver500(products)
+
+        assertEquals(expected, actual, 0.001)
+    }
+
 
     // จงเขียน test cases เช็คจำนวนสินค้าที่อยู่ในหมวด 'Electronics' และมีราคามากกว่า 500 บาท
     // 🚨
+    @Test
+    fun `test count Electronics over 500`() {
+        val products = listOf(
+            Product(name = "Laptop", price = 35000.0, category = "Electronics"),
+            Product(name = "Smartphone", price = 25000.0, category = "Electronics"),
+            Product(name = "T-shirt", price = 450.0, category = "Apparel"),
+            Product(name = "Monitor", price = 7500.0, category = "Electronics"),
+            Product(name = "Keyboard", price = 499.0, category = "Electronics"),
+            Product(name = "Jeans", price = 1200.0, category = "Apparel"),
+            Product(name = "Headphones", price = 1800.0, category = "Electronics")
+        )
 
+        val expected = 4.0
+        val actual = forTestCountElecPriceOver500(products)
+
+        assertEquals(expected, actual, 0.001)
+    }
 
     // --- Tests for Workshop #2: Data Analysis Pipeline End ---
 }
