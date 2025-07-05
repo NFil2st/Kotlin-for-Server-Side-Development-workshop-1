@@ -3,6 +3,7 @@ package com.example
 import com.example.IngredientsRepository.Ingredients
 import com.example.RecipeIngredientRepository.recipeIngredients
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.invoke
 import io.ktor.server.application.*
 import io.ktor.server.request.receive
 import io.ktor.server.response.*
@@ -56,6 +57,28 @@ object RecipesRepository {
 
     fun delete(id: Int): Boolean {
         return Recipes.removeIf { it.id == id }
+    }
+
+    fun search(ingredientName: String): List<Pair<Recipes, List<RecipeIngredient>>> {
+        val matchedIngredients = IngredientsRepository.getAll().filter {
+            it.name.contains(ingredientName, ignoreCase = true)
+        }
+
+        if (matchedIngredients.isEmpty()) return emptyList()
+
+        val matchedIngredientIds = matchedIngredients.map { it.id }
+
+        val matchingRecipeIds = RecipeIngredientRepository.getAll()
+            .filter { it.ingredientId in matchedIngredientIds }
+            .map { it.recipeId }
+            .distinct()
+
+        val matchingRecipes = RecipesRepository.getAll().filter { it.id in matchingRecipeIds }
+
+        return matchingRecipes.map { recipe ->
+            val ingredientsInRecipe = RecipeIngredientRepository.getAll().filter { it.recipeId == recipe.id }
+            recipe to ingredientsInRecipe
+        }
     }
 }
 
@@ -227,7 +250,7 @@ fun Application.configureRouting() {
                 }
             }
         }
-        get ("/Recipes/search"){
+        get("/Recipes/search") {
             val ingredientName = call.request.queryParameters["ingredient"]
 
             if (ingredientName.isNullOrBlank()) {
@@ -235,30 +258,18 @@ fun Application.configureRouting() {
                 return@get
             }
 
-            //หาวัตถุดิบ
-            val matchedIngredients = IngredientsRepository.getAll().filter {
-                it.name.contains(ingredientName, ignoreCase = true)
-            }
+            val searchResults = RecipesRepository.search(ingredientName)
 
-            if (matchedIngredients.isEmpty()) {
-                call.respond(HttpStatusCode.NotFound, "No ingredients matched '$ingredientName'")
-                return@get
-            }
-
-            //ดูว่าถ้ามี มันจะอยู่ในอาหารอะไร
-            val matchedIngredientIds = matchedIngredients.map { it.id }
-
-            val matchingRecipeIds = RecipeIngredientRepository.getAll()
-                .filter { it.ingredientId in matchedIngredientIds }
-                .map { it.recipeId }
-                .distinct()
-
-            val matchingRecipes = RecipesRepository.getAll().filter { it.id in matchingRecipeIds }
-
-            if (matchingRecipes.isEmpty()) {
+            if (searchResults.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "No recipes found using ingredient '$ingredientName'")
             } else {
-                call.respond(HttpStatusCode.OK, matchingRecipes)
+                val result = searchResults.map { (recipe, ingredients) ->
+                    mapOf(
+                        "recipe" to recipe,
+                        "ingredients" to ingredients
+                    )
+                }
+                call.respond(HttpStatusCode.OK, result)
             }
         }
 
