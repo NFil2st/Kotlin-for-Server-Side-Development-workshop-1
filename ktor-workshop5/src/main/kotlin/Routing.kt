@@ -96,7 +96,7 @@ object IngredientsRepository {
         Ingredients(id = 9, name = "ผักรวม", quantity = 150, unit = "กรัม"),
         Ingredients(id = 10, name = "ซอสปรุงรส", quantity = 1, unit = "ช้อนโต๊ะ")
     )
-    private var nextId = 4
+    private var nextId = 11
 
     fun getAll(): List<Ingredients> = Ingredients
 
@@ -174,6 +174,9 @@ object RecipeIngredientRepository {
             false
         }
     }
+    fun clear() {
+        recipeIngredients.clear()
+    }
 
     fun delete(recipeId: Int, ingredientId: Int): Boolean {
         return recipeIngredients.removeIf {
@@ -186,7 +189,7 @@ fun Application.configureRouting() {
     routing {
 
         //Recipes
-        get("/Recipes") {
+        get("/recipes") {
             val allRecipes = RecipesRepository.getAll()
             if (allRecipes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -195,7 +198,7 @@ fun Application.configureRouting() {
             }
         }
 
-        get("/Recipes/{id}") {
+        get("/recipes/{id}") {
             val allRecipes = RecipesRepository.getAll()
             if (allRecipes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -208,13 +211,13 @@ fun Application.configureRouting() {
 
                 val recipe  = RecipesRepository.getById(id)
                 if (recipe  != null) {
-                    call.respond(Recipes)
+                    call.respond(recipe)
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Recipes not found")
                 }
             }
         }
-        post("/Recipes") {
+        post("/recipes") {
             val allRecipes = RecipesRepository.getAll()
             if (allRecipes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -225,18 +228,19 @@ fun Application.configureRouting() {
             }
         }
 
-        put("/Recipes/{id}") {
+        put("/recipes/{id}") {
             val recipeId = call.parameters["id"]?.toIntOrNull()
+            val updatedRecipe = call.receive<Recipes>()
             if (recipeId == null) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
             }else{
                 val task = RecipesRepository.getById(recipeId)
                 if (task != null) {
-                    call.respond(HttpStatusCode.OK, Recipes)
+                    call.respond(HttpStatusCode.OK, updatedRecipe)
                 }
             }
         }
-        delete("/Recipes/{id}") {
+        delete("/recipes/{id}") {
             val recipeId = call.parameters["id"]?.toIntOrNull()
             if (recipeId == null) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -250,7 +254,7 @@ fun Application.configureRouting() {
                 }
             }
         }
-        get("/Recipes/search") {
+        get("/recipes/search") {
             val ingredientName = call.request.queryParameters["ingredient"]
 
             if (ingredientName.isNullOrBlank()) {
@@ -274,7 +278,7 @@ fun Application.configureRouting() {
         }
 
         //Ingredients
-        get("/Ingredients") {
+        get("/ingredients") {
             val allIngredients = IngredientsRepository.getAll()
             if (allIngredients.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -283,7 +287,7 @@ fun Application.configureRouting() {
             }
         }
 
-        get("/Ingredients/{id}") {
+        get("/ingredients/{id}") {
             val allIngredients = IngredientsRepository.getAll()
             if (allIngredients.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -296,13 +300,13 @@ fun Application.configureRouting() {
 
                 val ingredient = IngredientsRepository.getById(id)
                 if (ingredient != null) {
-                    call.respond(Ingredients)
+                    call.respond(ingredient)
                 } else {
                     call.respond(HttpStatusCode.NotFound, "Ingredients not found")
                 }
             }
         }
-        post("/Ingredients") {
+        post("/ingredients") {
             val allIngredients = IngredientsRepository.getAll()
             if (allIngredients.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -313,7 +317,7 @@ fun Application.configureRouting() {
             }
         }
 
-        put("/Ingredients/{id}") {
+        put("/ingredients/{id}") {
             val ingredientId = call.parameters["id"]?.toIntOrNull()
             if (ingredientId == null) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -324,7 +328,7 @@ fun Application.configureRouting() {
                 }
             }
         }
-        delete("/Ingredients/{id}") {
+        delete("/ingredients/{id}") {
             val ingredientId = call.parameters["id"]?.toIntOrNull()
             if (ingredientId == null) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -340,7 +344,7 @@ fun Application.configureRouting() {
         }
 
         // RecipeIngredients
-        get("/RecipeIngredients") {
+        get("/recipeingredients") {
             val allRecipeIngredients = RecipeIngredientRepository.getAll()
             if (allRecipeIngredients.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Not found")
@@ -349,7 +353,7 @@ fun Application.configureRouting() {
             }
         }
 
-        get("/RecipeIngredients/{recipeId}/{ingredientId}") {
+        get("/recipeingredients/{recipeId}/{ingredientId}") {
             val recipeId = call.parameters["recipeId"]?.toIntOrNull()
             val ingredientId = call.parameters["ingredientId"]?.toIntOrNull()
 
@@ -366,7 +370,7 @@ fun Application.configureRouting() {
             }
         }
 
-        post("/RecipeIngredients") {
+        post("/recipeingredients") {
             val newItem = call.receive<RecipeIngredient>()
             val added = RecipeIngredientRepository.add(newItem)
 
@@ -377,7 +381,7 @@ fun Application.configureRouting() {
             }
         }
 
-        put("/RecipeIngredients/{recipeId}/{ingredientId}") {
+        put("/recipeingredients/{recipeId}/{ingredientId}") {
             val recipeId = call.parameters["recipeId"]?.toIntOrNull()
             val ingredientId = call.parameters["ingredientId"]?.toIntOrNull()
 
@@ -396,7 +400,7 @@ fun Application.configureRouting() {
             }
         }
 
-        delete("/RecipeIngredients/{recipeId}/{ingredientId}") {
+        delete("/recipeingredients/{recipeId}/{ingredientId}") {
             val recipeId = call.parameters["recipeId"]?.toIntOrNull()
             val ingredientId = call.parameters["ingredientId"]?.toIntOrNull()
 
